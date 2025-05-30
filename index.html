@@ -2,16 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>All Videos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Site - Home</title>
   <style>
+    /* Basic Reset */
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
-      margin: 10px;
+      margin: 0; padding: 0;
     }
-    h2 {
+    /* Hamburger Menu Styles */
+    .menu-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .menu-btn span {
+      display: block;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+    }
+    /* Sidebar menu */
+    .side-menu {
+      position: fixed;
+      top: 0; left: -250px;
+      width: 250px;
+      height: 100vh;
+      background: #222;
+      color: white;
+      padding: 60px 20px 20px 20px;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    .side-menu.open {
+      left: 0;
+    }
+    .side-menu h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #555;
+      padding-bottom: 5px;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .side-menu ul li {
+      margin-bottom: 12px;
+    }
+    .side-menu ul li a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .side-menu ul li a:hover {
+      color: #ff5722;
+    }
+    /* Overlay to close menu */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+    .overlay.active {
+      display: block;
+    }
+    /* Main content */
+    main {
+      padding: 20px;
+      margin-top: 60px;
+    }
+    h1 {
       text-align: center;
+      margin-bottom: 20px;
     }
+    /* Video Grid */
     .video-grid {
       display: flex;
       flex-wrap: wrap;
@@ -21,74 +101,123 @@
     .video-item {
       width: 100%;
       max-width: 320px;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      background: #fff;
     }
     .video-item img {
       width: 100%;
-      border-radius: 10px;
+      display: block;
+      border-radius: 10px 10px 0 0;
     }
-    .video-item h3 {
+    .video-info {
+      padding: 8px 10px;
       text-align: center;
-      font-size: 16px;
-      margin-top: 8px;
     }
-    .video-item a {
-      text-decoration: none;
-      color: black;
+    .video-info h3 {
+      margin: 0 0 5px;
+      font-size: 16px;
+      color: #333;
+    }
+    /* Fake views badge */
+    .views-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      font-size: 12px;
+      padding: 3px 7px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    /* Responsive */
+    @media (max-width: 400px) {
+      .video-item {
+        max-width: 90vw;
+      }
     }
   </style>
-
-  <!-- JuicyAds v3.0 -->
-  <script type="text/javascript" data-cfasync="false" async src="https://poweredby.jads.co/js/jads.js"></script>
 </head>
 <body>
 
-<h2>📽️ All Videos</h2>
-
-<!-- JuicyAds Banner Ad -->
-<div style="display: flex; justify-content: center; margin-bottom: 20px;">
-  <ins id="1092165" data-width="300" data-height="100"></ins>
-  <script type="text/javascript" data-cfasync="false" async>
-    (adsbyjuicy = window.adsbyjuicy || []).push({'adzone':1092165});
-  </script>
-</div>
-
-<div class="video-grid">
-  <div class="video-item">
-    <a href="p/pst01.html">
-      <img src="https://files.catbox.moe/w07sfd.jpg" alt="indain girl nude">
-    </a>
-    <h3><a href="p/pst01.html">indain girl nude</a></h3>
+  <!-- Hamburger menu button -->
+  <div class="menu-btn" id="menu-btn" aria-label="Toggle menu" role="button" tabindex="0">
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
 
-  <div class="video-item">
-    <a href="p/pst02.html">
-      <img src="https://files.catbox.moe/d9tkj8.jpg" alt="indain girl show pussy">
-    </a>
-    <h3><a href="p/pst02.html">indain girl show pussy</a></h3>
-  </div>
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
 
-  <div class="video-item">
-    <a href="p/pst03.html">
-      <img src="https://files.catbox.moe/v7yutm.jpg" alt="indain girl stripping">
-    </a>
-    <h3><a href="p/pst03.html">indain girl stripping</a></h3>
-  </div>
+  <!-- Sidebar menu -->
+  <nav class="side-menu" id="side-menu" aria-label="Sidebar navigation">
+    <h3>Menu</h3>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="categories.html">Categories</a></li>
+      <li><a href="hashtags.html">Hashtags</a></li>
+    </ul>
+  </nav>
 
-  <div class="video-item">
-    <a href="p/pst04.html">
-      <img src="https://files.catbox.moe/c169qa.jpg" alt="sexy indian girl stripping">
-    </a>
-    <h3><a href="p/pst04.html">sexy indian girl stripping</a></h3>
-  </div>
+  <main>
+    <h1>📽️ All Videos</h1>
+    <div class="video-grid" id="video-grid">
+      <!-- Videos will be injected here by JS -->
+    </div>
 
-  <!-- Add more items as needed -->
-</div>
+    <!-- Pagination -->
+    <div style="text-align:center; margin-top:20px;">
+      <button id="prev-btn" disabled>Previous</button>
+      <span id="page-info">Page 1</span>
+      <button id="next-btn">Next</button>
+    </div>
+  </main>
 
-</body>
-</html>
+  <script>
+    // Hamburger menu toggle
+    const menuBtn = document.getElementById('menu-btn');
+    const sideMenu = document.getElementById('side-menu');
+    const overlay = document.getElementById('overlay');
 
+    function toggleMenu() {
+      sideMenu.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
 
-</body>
-</html>
+    menuBtn.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+    menuBtn.addEventListener('keypress', e => {
+      if(e.key === 'Enter') toggleMenu();
+    });
+
+    // Sample video data
+    const videos = [
+      { id: 1, title: 'Indian girl nude', img: 'https://files.catbox.moe/w07sfd.jpg', views: '4.2k', categories: ['Indian'], hashtags: ['nude'] },
+      { id: 2, title: 'Indian girl show pussy', img: 'https://files.catbox.moe/d9tkj8.jpg', views: '3.3k', categories: ['Indian'], hashtags: ['show', 'pussy'] },
+      { id: 3, title: 'Indian girl stripping', img: 'https://files.catbox.moe/v7yutm.jpg', views: '5.1k', categories: ['Indian'], hashtags: ['stripping'] },
+      { id: 4, title: 'Sexy Indian girl stripping', img: 'https://files.catbox.moe/c169qa.jpg', views: '6.0k', categories: ['Indian'], hashtags: ['sexy', 'stripping'] },
+      { id: 5, title: 'Foreign girl bikini', img: 'https://placekitten.com/320/180', views: '4.8k', categories: ['Foreign'], hashtags: ['bikini'] },
+      { id: 6, title: 'Foreign girl beach', img: 'https://placekitten.com/321/181', views: '3.6k', categories: ['Foreign'], hashtags: ['beach'] },
+      { id: 7, title: 'Indian dance video', img: 'https://placekitten.com/322/182', views: '2.9k', categories: ['Indian'], hashtags: ['dance'] },
+      { id: 8, title: 'Foreign party', img: 'https://placekitten.com/323/183', views: '3.0k', categories: ['Foreign'], hashtags: ['party'] },
+      { id: 9, title: 'Indian fashion show', img: 'https://placekitten.com/324/184', views: '4.0k', categories: ['Indian'], hashtags: ['fashion'] },
+      { id: 10, title: 'Foreign model shoot', img: 'https://placekitten.com/325/185', views: '5.5k', categories: ['Foreign'], hashtags: ['model'] },
+      { id: 11, title: 'Indian girl smile', img: 'https://placekitten.com/326/186', views: '3.2k', categories: ['Indian'], hashtags: ['smile'] }
+      // Add more as you want
+    ];
+
+    // Pagination variables
+    const videosPerPage = 10;
+    let currentPage = 1;
+    let filteredVideos = videos; // For future filter usage
+
+    // Elements
+    const videoGrid = document.getElementById('video-grid');
+    const prevBtn = document.getElementById
+
 
 
