@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Video Site</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Basic adult video listing site (template)">
+  <style>
+    :root {
+      --bg:#0f0f13;--bg-alt:#18181f;--panel:#202028;--accent:#ff2f72;--accent-grad:linear-gradient(135deg,#ff2f72,#ff7f2f);--text:#eee;--muted:#aaa;--radius:14px;--shadow:0 4px 14px -4px rgba(0,0,0,.6);
+      --danger:#ff3b30;--good:#3ddc97;--warn:#ffb347;--link:#66b2ff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,sans-serif}
+    body{background:var(--bg);color:var(--text);line-height:1.4;-webkit-font-smoothing:antialiased;}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{position:sticky;top:0;z-index:50;background:rgba(15,15,19,.92);backdrop-filter:blur(12px);display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #282830}
+    #logo{font-size:20px;font-weight:700;background:var(--accent-grad);-webkit-background-clip:text;color:transparent;}
+    #homeBtn{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--panel);border:1px solid #2a2a34;cursor:pointer;}
+    #homeBtn:hover{background:#2c2c36}
+    .icon{width:22px;height:22px;fill:var(--text)}
+    .grow{flex:1}
+    #hamburger{width:44px;height:44px;display:flex;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:6px;border-radius:12px;border:1px solid #2a2a34;background:var(--panel)}
+    #hamburger span{height:3px;width:100%;background:var(--text);border-radius:2px;transition:.3s}
+    #hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+    #hamburger.open span:nth-child(2){opacity:0}
+    #hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+    nav#sideMenu{position:fixed;inset:0 0 0 auto;width:300px;max-width:86%;background:#141419;border-left:1px solid #242430;box-shadow:-2px 0 14px -4px rgba(0,0,0,.6);transform:translateX(105%);transition:.38s cubic-bezier(.45,.07,.2,.99);padding:26px 22px;overflow-y:auto;z-index:60}
+    nav#sideMenu.open{transform:translateX(0)}
+    nav h3{font-size:14px;font-weight:600;letter-spacing:.5px;margin:24px 0 10px;color:var(--muted);text-transform:uppercase}
+    nav ul{list-style:none;display:grid;gap:8px}
+    nav li a{display:block;padding:10px 14px;border-radius:10px;background:#1f1f27;font-size:15px;font-weight:500;border:1px solid #2a2a34}
+    nav li a:hover{background:#272732}
+    main{padding:22px;max-width:1300px;margin:0 auto}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px}
+    .video-card{background:var(--panel);border:1px solid #2a2a34;border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative;cursor:pointer;transition:.25s}
+    .video-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px -6px rgba(0,0,0,.55)}
+    .thumb-wrapper{aspect-ratio:16/9;position:relative;overflow:hidden}
+    .thumb-wrapper img{width:100%;height:100%;object-fit:cover;display:block;transition:.45s}
+    .video-card:hover img{transform:scale(1.08)}
+    .badge{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.65);padding:4px 8px;border-radius:20px;font-size:11px;font-weight:600;backdrop-filter:blur(3px)}
+    .card-body{padding:10px 12px 14px;font-size:13.5px;font-weight:500;flex:1;display:flex}
+    .card-body span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .pagination{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+    .pagination button{background:#1e1e26;border:1px solid #31313b;color:var(--text);padding:9px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500}
+    .pagination button.active{background:var(--accent-grad);color:#fff;border-color:#ff2f72}
+    .pagination button:hover{background:#272732}
+    .filters-bar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+    .pill{display:inline-flex;align-items:center;padding:6px 14px;font-size:13px;font-weight:500;border-radius:999px;background:#1f1f27;border:1px solid #2a2a34;cursor:pointer;transition:.3s}
+    .pill:hover{background:#272732}
+    .pill.active{background:var(--accent-grad);border-color:#ff2f72;color:#fff}
+    #viewTitle{font-size:26px;font-weight:700;margin:0 0 16px;background:var(--accent-grad);-webkit-background-clip:text;color:transparent}
+    #videoDetail{display:grid;gap:20px}
+    .detail-wrapper{display:grid;gap:18px}
+    .player{width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--radius);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+    .player video{width:100%;height:100%;display:block;object-fit:cover;background:#000}
+    .meta{display:flex;flex-direction:column;gap:12px;background:var(--panel);padding:18px 20px;border:1px solid #2a2a34;border-radius:var(--radius)}
+    .hashtags,.categories{display:flex;flex-wrap:wrap;gap:8px}
+    .hashtags a,.categories a{background:#1f1f27;border:1px solid #2a2a34;font-size:12px;padding:5px 10px;border-radius:999px}
+    .hashtags a:hover,.categories a:hover{background:#272732}
+    .section-title{font-size:20px;font-weight:600;margin:10px 0 14px}
+    #relatedGrid .video-card{font-size:12px}
+    #noticeTop{background:#d4edda;color:#155724;padding:15px;border-radius:8px;font-size:18px;font-weight:700;text-align:center;margin-bottom:20px}
+    .ad-slot{margin:28px 0;padding:14px;border:1px dashed #3a3a44;border-radius:14px;background:#181820;min-height:60px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);position:relative}
+    .ad-slot:before{content:"Ad";position:absolute;top:-10px;left:14px;background:#ff2f72;color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:8px;letter-spacing:.5px}
+    footer{margin-top:50px;padding:40px 20px;background:#111115;border-top:1px solid #24242c;font-size:13px;color:var(--muted)}
+    footer a{color:var(--muted)}
+    footer a:hover{color:#fff}
+    .tagline{font-size:14px;margin-bottom:14px;color:#ccc}
+    .menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);z-index:55;opacity:0;pointer-events:none;transition:.3s}
+    .menu-overlay.open{opacity:1;pointer-events:auto}
+    @media (min-width:1000px){
+      #videoDetail{grid-template-columns:2fr 1fr}
+      .meta{height:max-content;position:sticky;top:86px}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <button id="homeBtn" title="Home" aria-label="Home">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z"/></svg>
+  </button>
+  <div id="logo">VideoSite</div>
+  <div class="grow"></div>
+  <div id="hamburger" aria-label="Menu" role="button" tabindex="0">
+    <span></span><span></span><span></span>
+  </div>
+</header>
+<div class="menu-overlay" id="menuOverlay"></div>
+<nav id="sideMenu" aria-label="Sidebar Navigation">
+  <h2 style="font-size:18px;font-weight:700;margin-top:0">Menu</h2>
+  <ul>
+    <li><a href="#/home">Home</a></li>
+    <li><a href="#/newest">Newest Videos</a></li>
+    <li><a href="#/viral">Viral Videos</a></li>
+    <li><a href="#/categories">Categories</a></li>
+    <li><a href="#/hashtags">Hashtags</a></li>
+    <li><a href="#/terms">Terms & Conditions</a></li>
+  </ul>
+  <h3>Filters</h3>
+  <div id="quickFilters"></div>
+  <h3>About</h3>
+  <p style="font-size:13px;line-height:1.5">This is a basic template. Add / edit videos inside the <code>videosData</code> array in the script. Everything is client-side static.</p>
+</nav>
+<main id="app" tabindex="-1"></main>
+<footer>
+  <div class="tagline">© <span id="year"></span> VideoSite. All rights reserved.</div>
+  <div><a href="#/terms">Terms & Conditions</a> • <a href="#/home">Home</a></div>
+</footer>
+
+<!-- ===================== AD SCRIPTS (ORDER MATTERS) ===================== -->
+<!-- 1st Ad Code Placeholder: Paste your first ad script below -->
+<div style="display:none">
+  <!-- <script>/* First ad network script here */</script> -->
+</div>
+<!-- 2nd Ad Code Placeholder -->
+<div style="display:none">
+  <!-- <script>/* Second ad network script here */</script> -->
+</div>
+<!-- 3rd Ad Code (REQUIRED latest script as per your rule) -->
+<script type='text/javascript' src='//pl26322105.profitableratecpm.com/fe/ab/b6/feabb6170d4bd77f3ae8b59f0914d5a1.js'></script>
+<!-- 4th Ad Code (Invoke) -->
+<script async="async" data-cfasync="false" src="//pl26381046.profitableratecpm.com/49da48e8fe71b1f70c99148d62b9a748/invoke.js"></script>
+<div id="container-49da48e8fe71b1f70c99148d62b9a748" style="display:none"></div>
+<!-- ===================================================================== -->
+
+<script>
+/*************************************
+ * VIDEO DATA CONFIGURATION
+ *************************************
+ * Each object represents a video. Modify / duplicate as needed.
+ * id: short unique id (also used for pst ID generation if you like)
+ * postId: optional blog style id (e.g., pst27). Increment when new unique video link.
+ * title: title of video
+ * thumb: URL to thumbnail image (could be a CDN, placeholder, or base64)
+ * source: URL to actual video file (mp4) or streaming link
+ * categories: array of category strings
+ * hashtags: array of hashtag strings WITHOUT '#'
+ * uploaded: ISO date string (used for newest sorting)
+ * viralScore: number (higher = more viral). You control logic.
+ *************************************/
+const videosData = [
+  {
+    id:"v1", postId:"pst27", title:"Sample Video One", thumb:"https://placehold.co/640x360?text=Video+1", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Romantic","Tease"], hashtags:["love","slow"], uploaded:"2025-07-01", viralScore: 89
+  },
+  {
+    id:"v2", postId:"pst28", title:"Sample Video Two", thumb:"https://placehold.co/640x360?text=Video+2", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Action"], hashtags:["fast","energy"], uploaded:"2025-07-05", viralScore: 140
+  },
+  {
+    id:"v3", postId:"pst29", title:"Sample Video Three", thumb:"https://placehold.co/640x360?text=Video+3", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Romantic"], hashtags:["soft"], uploaded:"2025-07-10", viralScore: 102
+  },
+  {
+    id:"v4", postId:"pst30", title:"Sample Video Four", thumb:"https://placehold.co/640x360?text=Video+4", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Tease"], hashtags:["play"], uploaded:"2025-07-11", viralScore: 55
+  },
+  { id:"v5", postId:"pst31", title:"Video Five", thumb:"https://placehold.co/640x360?text=Video+5", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Action"], hashtags:["energy"], uploaded:"2025-07-12", viralScore: 77 },
+  { id:"v6", postId:"pst32", title:"Video Six", thumb:"https://placehold.co/640x360?text=Video+6", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Tease"], hashtags:["fun"], uploaded:"2025-07-13", viralScore: 95 },
+  { id:"v7", postId:"pst33", title:"Video Seven", thumb:"https://placehold.co/640x360?text=Video+7", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Action"], hashtags:["fast"], uploaded:"2025-07-14", viralScore: 155 },
+  { id:"v8", postId:"pst34", title:"Video Eight", thumb:"https://placehold.co/640x360?text=Video+8", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Romantic"], hashtags:["slow"], uploaded:"2025-07-15", viralScore: 60 },
+  { id:"v9", postId:"pst35", title:"Video Nine", thumb:"https://placehold.co/640x360?text=Video+9", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Tease"], hashtags:["play"], uploaded:"2025-07-16", viralScore: 81 },
+  { id:"v10", postId:"pst36", title:"Video Ten", thumb:"https://placehold.co/640x360?text=Video+10", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Action"], hashtags:["energy"], uploaded:"2025-07-17", viralScore: 210 },
+  { id:"v11", postId:"pst37", title:"Video Eleven", thumb:"https://placehold.co/640x360?text=Video+11", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Romantic"], hashtags:["soft"], uploaded:"2025-07-18", viralScore: 33 },
+  { id:"v12", postId:"pst38", title:"Video Twelve", thumb:"https://placehold.co/640x360?text=Video+12", source:"https://www.w3schools.com/html/mov_bbb.mp4", categories:["Action"], hashtags:["fast"], uploaded:"2025-07-18", viralScore: 166 }
+];
+
+/*************************************
+ * BASIC STATE & HELPERS
+ *************************************/
+const PAGE_SIZE = 10;
+const app = document.getElementById('app');
+const sideMenu = document.getElementById('sideMenu');
+const hamburger = document.getElementById('hamburger');
+const overlay = document.getElementById('menuOverlay');
+const yearEl = document.getElementById('year');
+yearEl.textContent = new Date().getFullYear();
+
+function openMenu(open){
+  sideMenu.classList.toggle('open',open);
+  hamburger.classList.toggle('open',open);
+  overlay.classList.toggle('open',open);
+  if(open) sideMenu.focus();
+}
+
+hamburger.addEventListener('click',()=>openMenu(!sideMenu.classList.contains('open')));
+overlay.addEventListener('click',()=>openMenu(false));
+
+document.getElementById('homeBtn').addEventListener('click',()=>navigateTo('#/home'));
+
+function navigateTo(hash){
+  if(location.hash!==hash){
+    location.hash = hash;
+  } else {
+    // force reload view
+    router();
+  }
+}
+
+window.addEventListener('hashchange',router);
+
+function router(){
+  openMenu(false);
+  const raw = location.hash || '#/home';
+  const [_, route, param] = raw.split('/');
+  switch(route){
+    case 'home': renderListView({title:'Latest Videos', sourceArray: newestSorted(), pageParam: param}); break;
+    case 'page': renderListView({title:'Videos', sourceArray: newestSorted(), pageParam: param}); break;
+    case 'video': renderVideoDetail(param); break;
+    case 'category': renderFiltered('Category', decodeURIComponent(param), v=>v.categories.includes(decodeURIComponent(param))); break;
+    case 'hashtag': renderFiltered('Hashtag', '#'+decodeURIComponent(param), v=>v.hashtags.includes(decodeURIComponent(param))); break;
+    case 'categories': renderCategoryIndex(); break;
+    case 'hashtags': renderHashtagIndex(); break;
+    case 'newest': renderListView({title:'Newest Videos', sourceArray: newestSorted(), pageParam: param}); break;
+    case 'viral': renderListView({title:'Viral Videos', sourceArray: viralSorted(), pageParam: param}); break;
+    case 'terms': renderTerms(); break;
+    default: renderNotFound();
+  }
+}
+
+function newestSorted(){
+  return [...videosData].sort((a,b)=> new Date(b.uploaded) - new Date(a.uploaded));
+}
+function viralSorted(){
+  return [...videosData].sort((a,b)=> b.viralScore - a.viralScore);
+}
+
+function paginate(array, page){
+  const totalPages = Math.max(1, Math.ceil(array.length / PAGE_SIZE));
+  const p = Math.min(Math.max(1,page), totalPages);
+  const slice = array.slice((p-1)*PAGE_SIZE, p*PAGE_SIZE);
+  return {slice,totalPages,page:p};
+}
+
+function renderListView({title,sourceArray,pageParam}){
+  const page = parseInt(pageParam||'1',10)||1;
+  const {slice,totalPages,page:currentPage} = paginate(sourceArray,page);
+  app.innerHTML = `
+    <h1 id="viewTitle">${title}</h1>
+    <div class="ad-slot">Ad Placement (Top)</div>
+    <div class="grid" id="videoGrid"></div>
+    <div class="pagination" id="pager"></div>
+    <div class="ad-slot">Ad Placement (Bottom)</div>
+  `;
+  const grid = document.getElementById('videoGrid');
+  slice.forEach(v=> grid.appendChild(videoCard(v)) );
+  buildPagination(totalPages,currentPage,(p)=>{
+    const base = location.hash.startsWith('#/viral') ? '#/viral/' : location.hash.startsWith('#/newest') ? '#/newest/' : '#/home/';
+    navigateTo(base + p);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function videoCard(v){
+  const card = document.createElement('div');
+  card.className='video-card';
+  card.innerHTML = `
+    <div class="thumb-wrapper">
+      <img loading="lazy" src="${v.thumb}" alt="${escapeHtml(v.title)} thumbnail">
+      <div class="badge">${formatDate(v.uploaded)}</div>
+    </div>
+    <div class="card-body"><span>${escapeHtml(v.title)}</span></div>
+  `;
+  card.addEventListener('click',()=>navigateTo('#/video/' + v.id));
+  return card;
+}
+
+function buildPagination(total,current, onGo){
+  const pager = document.getElementById('pager');
+  if(!pager) return;
+  for(let p=1;p<=total;p++){
+    const btn=document.createElement('button');
+    btn.textContent = p;
+    if(p===current) btn.classList.add('active');
+    btn.addEventListener('click',()=>onGo(p));
+    pager.appendChild(btn);
+  }
+}
+
+function renderVideoDetail(id){
+  const v = videosData.find(x=>x.id===id);
+  if(!v) return renderNotFound();
+  const related = pickRelated(v,6);
+  app.innerHTML = `
+    <div id="noticeTop">✅ Link ready! Scroll down to view and download video at the end of page.</div>
+    <div id="videoDetail">
+      <div class="detail-wrapper">
+        <h1 id="viewTitle">${escapeHtml(v.title)}</h1>
+        <div class="player">
+          <video controls preload="metadata" poster="${v.thumb}">
+            <source src="${v.source}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="ad-slot">Ad Placement (Middle)</div>
+        <div class="meta">
+          <div><strong>Uploaded:</strong> ${formatDate(v.uploaded)} | <strong>Post ID:</strong> ${v.postId||'-'}</div>
+          <div class="categories">${v.categories.map(c=>`<a href="#/category/${encodeURIComponent(c)}">${escapeHtml(c)}</a>`).join(' ')}</div>
+          <div class="hashtags">${v.hashtags.map(h=>`<a href="#/hashtag/${encodeURIComponent(h)}">#${escapeHtml(h)}</a>`).join(' ')}</div>
+          <div style="font-size:12px;color:var(--muted);">(Add your description text here)</div>
+          <div class="ad-slot">Ad Placement (Inside Meta)</div>
+          <div style="margin-top:6px;font-size:13px"><strong>Download:</strong> <a href="${v.source}" download>Click to Download Video</a></div>
+        </div>
+        <section>
+          <h2 class="section-title">Related Videos</h2>
+          <div class="grid" id="relatedGrid"></div>
+        </section>
+      </div>
+      <div>
+        <div class="ad-slot">Sidebar Ad</div>
+      </div>
+    </div>
+  `;
+  const relGrid = document.getElementById('relatedGrid');
+  related.forEach(r=> relGrid.appendChild(videoCard(r)) );
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pickRelated(v, limit){
+  const pool = videosData.filter(x=> x.id!==v.id && (x.categories.some(c=>v.categories.includes(c)) || x.hashtags.some(h=>v.hashtags.includes(h))));
+  if(pool.length < limit){
+    const extras = videosData.filter(x=>x.id!==v.id && !pool.includes(x));
+    pool.push(...extras);
+  }
+  return shuffle(pool).slice(0,limit);
+}
+
+function shuffle(arr){
+  return [...arr].sort(()=>Math.random()-.5);
+}
+
+function renderFiltered(label, value, predicate){
+  const list = videosData.filter(predicate);
+  renderListView({title:`${label}: ${escapeHtml(value)}`, sourceArray:list, pageParam: '1'});
+}
+
+function renderCategoryIndex(){
+  const cats = aggregateCounts(videosData.flatMap(v=>v.categories));
+  app.innerHTML = `<h1 id="viewTitle">All Categories</h1><div class="grid" id="catGrid"></div>`;
+  const g = document.getElementById('catGrid');
+  cats.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='video-card';
+    d.style.padding='18px';
+    d.innerHTML=`<div style="font-size:16px;font-weight:600;margin-bottom:4px">${escapeHtml(c.name)}</div><div style="color:var(--muted);font-size:12px">${c.count} videos</div>`;
+    d.addEventListener('click',()=>navigateTo('#/category/'+encodeURIComponent(c.name)));
+    g.appendChild(d);
+  });
+}
+
+function renderHashtagIndex(){
+  const tags = aggregateCounts(videosData.flatMap(v=>v.hashtags));
+  app.innerHTML = `<h1 id="viewTitle">All Hashtags</h1><div class="grid" id="tagGrid"></div>`;
+  const g = document.getElementById('tagGrid');
+  tags.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='video-card';
+    d.style.padding='18px';
+    d.innerHTML=`<div style="font-size:16px;font-weight:600;margin-bottom:4px">#${escapeHtml(t.name)}</div><div style="color:var(--muted);font-size:12px">${t.count} videos</div>`;
+    d.addEventListener('click',()=>navigateTo('#/hashtag/'+encodeURIComponent(t.name)));
+    g.appendChild(d);
+  });
+}
+
+function aggregateCounts(items){
+  const map = new Map();
+  items.forEach(i=> map.set(i,(map.get(i)||0)+1));
+  return [...map.entries()].map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
+}
+
+function renderTerms(){
+  app.innerHTML = `
+    <h1 id="viewTitle">Terms & Conditions</h1>
+    <article style="background:var(--panel);padding:22px 26px;border:1px solid #2a2a34;border-radius:var(--radius);display:grid;gap:18px;font-size:14px;line-height:1.55">
+      <p><strong>1. Adult Content Warning:</strong> This site may contain mature material intended for adults only. By using this site you confirm you are of legal age in your jurisdiction.</p>
+      <p><strong>2. Content Ownership:</strong> All videos you upload or link must be owned by you or properly licensed. Do not upload illegal, non-consensual, or prohibited content.</p>
+      <p><strong>3. DMCA / Takedown:</strong> For removal requests, contact the site owner with clear identifying information about the material.</p>
+      <p><strong>4. User Responsibility:</strong> You are responsible for complying with local laws. If you disagree with any terms, discontinue use immediately.</p>
+      <p><strong>5. Ads & Tracking:</strong> Ads may use cookies or similar technologies. Adjust browser settings if you wish to disable tracking.</p>
+      <p><strong>6. Changes:</strong> Terms may be updated; continued use constitutes acceptance of changes.</p>
+    </article>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderNotFound(){
+  app.innerHTML = `<h1 id="viewTitle">Not Found</h1><p style="margin-top:10px">The requested page does not exist. <a href="#/home">Return Home</a></p>`;
+}
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+function formatDate(dateStr){
+  const d = new Date(dateStr);
+  if(!d.getTime()) return dateStr;
+  return d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+}
+
+/*************************************
+ * QUICK FILTER PILLS (Top 5 categories / hashtags)
+ *************************************/
+function loadQuickFilters(){
+  const qf = document.getElementById('quickFilters');
+  if(!qf) return;
+  const cats = aggregateCounts(videosData.flatMap(v=>v.categories)).slice(0,5);
+  const tags = aggregateCounts(videosData.flatMap(v=>v.hashtags)).slice(0,5);
+  qf.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px"></div>';
+  const wrap = qf.firstChild;
+  cats.forEach(c=>{
+    const pill=document.createElement('div');
+    pill.className='pill';
+    pill.textContent=c.name;
+    pill.addEventListener('click',()=>navigateTo('#/category/'+encodeURIComponent(c.name)));
+    wrap.appendChild(pill);
+  });
+  tags.forEach(t=>{
+    const pill=document.createElement('div');
+    pill.className='pill';
+    pill.textContent='#'+t.name;
+    pill.addEventListener('click',()=>navigateTo('#/hashtag/'+encodeURIComponent(t.name)));
+    wrap.appendChild(pill);
+  });
+}
+
+/*************************************
+ * INITIALIZE
+ *************************************/
+loadQuickFilters();
+router();
+
+</script>
+</body>
+</html>
